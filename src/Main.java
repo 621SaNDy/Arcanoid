@@ -5,12 +5,55 @@ import java.awt.event.*;
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Arkanoid");
-        GamePanel gamePanel = new GamePanel();
+        MenuPanel menuPanel = new MenuPanel(frame);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
-        frame.add(gamePanel);
+        frame.setMinimumSize(new Dimension(600,400));
+        frame.add(menuPanel);
         frame.setVisible(true);
+    }
+}
+
+class MenuPanel extends JPanel {
+    private JFrame frame;
+
+    public MenuPanel(JFrame frame) {
+        this.frame = frame;
+        this.setLayout(new BorderLayout());
+        this.setBackground(Color.BLACK);
+
+        JLabel titleLabel = new JLabel("Wybierz Poziom Trudności", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(0xA5A5A5));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setSize(new Dimension(60,100));
+        buttonPanel.setBackground(Color.BLACK);
+
+
+        JButton easyButton = new JButton("Łatwy");
+        JButton mediumButton = new JButton("Średni");
+        JButton hardButton = new JButton("Trudny");
+
+        easyButton.addActionListener(e -> startGame("EASY"));
+        mediumButton.addActionListener(e -> startGame("MEDIUM"));
+        hardButton.addActionListener(e -> startGame("HARD"));
+
+        buttonPanel.add(easyButton);
+        buttonPanel.add(mediumButton);
+        buttonPanel.add(hardButton);
+
+        this.add(titleLabel, BorderLayout.NORTH);
+        this.add(buttonPanel, BorderLayout.CENTER);
+    }
+
+    private void startGame(String difficulty) {
+        GamePanel gamePanel = new GamePanel(difficulty);
+        frame.getContentPane().removeAll();
+        frame.add(gamePanel);
+        frame.revalidate();
+        frame.repaint();
     }
 }
 
@@ -31,16 +74,36 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     int countdown = 3;
     boolean gameStarted = false;
+    private String difficulty;
 
-    public GamePanel() {
+    public GamePanel(String difficulty) {
+        this.difficulty = difficulty;
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        adjustDifficulty();
 
         timer = new Timer(10, this);
         timer.start();
 
         initializeBricks();
         startCountdown();
+    }
+    private void adjustDifficulty() {
+        switch (difficulty) {
+            case "EASY":
+                ballXDir = -2;
+                ballYDir = -3;
+                break;
+            case "MEDIUM":
+                ballXDir = -3;
+                ballYDir = -4;
+                break;
+            case "HARD":
+                ballXDir = -4;
+                ballYDir = -5;
+                break;
+        }
     }
 
     private void initializeBricks() {
