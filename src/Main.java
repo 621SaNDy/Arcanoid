@@ -16,7 +16,7 @@ public class Main {
 }
 
 class MenuPanel extends JPanel {
-    private JFrame frame;
+    private final JFrame frame;
 
     public MenuPanel(JFrame frame) {
         this.frame = frame;
@@ -36,9 +36,9 @@ class MenuPanel extends JPanel {
         JButton mediumButton = new JButton("Średni");
         JButton hardButton = new JButton("Trudny");
 
-        easyButton.addActionListener(e -> startGame("EASY"));
-        mediumButton.addActionListener(e -> startGame("MEDIUM"));
-        hardButton.addActionListener(e -> startGame("HARD"));
+        easyButton.addActionListener(_ -> startGame("EASY"));
+        mediumButton.addActionListener(_ -> startGame("MEDIUM"));
+        hardButton.addActionListener(_ -> startGame("HARD"));
 
         buttonPanel.add(easyButton);
         buttonPanel.add(mediumButton);
@@ -74,7 +74,7 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     int countdown = 3;
     boolean gameStarted = false;
-    private String difficulty;
+    private final String difficulty;
 
     public GamePanel(String difficulty) {
         this.difficulty = difficulty;
