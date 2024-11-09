@@ -39,12 +39,15 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         timer = new Timer(10, this);
         timer.start();
 
+        initializeBricks();
+        startCountdown();
+    }
+
+    private void initializeBricks() {
         bricks = new Brick[numBricks];
         for (int i = 0; i < numBricks; i++) {
             bricks[i] = new Brick((i % 5) * 100 + 50, (i / 5) * 30 + 50, 80, 20);
         }
-
-        startCountdown();
     }
 
     private void startCountdown() {
@@ -61,8 +64,23 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         countdownTimer.start();
     }
 
+    private void resetGame() {
+        paddleX = 250;
+        ballX = 300;
+        ballY = 200;
+        ballXDir = -2;
+        ballYDir = -3;
+        initializeBricks();
+        countdown = 3;
+        gameStarted = false;
+        startCountdown();
+        timer.start();
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        setBackground(Color.BLACK);
 
         if (!gameStarted) {
             g.setColor(new Color(0, 0, 0, 150));
@@ -119,7 +137,13 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         if (ballY > getHeight()) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "Game Over!");
+            int response = JOptionPane.showConfirmDialog(this, "Game Over! Play Again?", "Game Over", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                resetGame();
+            }
+            else {
+                System.exit(0);
+            }
         }
 
         repaint();
