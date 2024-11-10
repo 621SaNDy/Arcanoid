@@ -31,7 +31,6 @@ class MenuPanel extends JPanel {
         buttonPanel.setSize(new Dimension(60,100));
         buttonPanel.setBackground(Color.BLACK);
 
-
         JButton easyButton = new JButton("Łatwy");
         JButton mediumButton = new JButton("Średni");
         JButton hardButton = new JButton("Trudny");
@@ -140,6 +139,15 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         timer.start();
     }
 
+    private boolean checkWinCondition() {
+        for (Brick brick : bricks) {
+            if (!brick.isDestroyed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -201,6 +209,17 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (ballY > getHeight()) {
             timer.stop();
             int response = JOptionPane.showConfirmDialog(this, "Game Over! Play Again?", "Game Over", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                resetGame();
+            }
+            else {
+                System.exit(0);
+            }
+        }
+
+        if (checkWinCondition()) {
+            timer.stop();
+            int response = JOptionPane.showConfirmDialog(this, "You Win! Play Again?", "Victory", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 resetGame();
             }
