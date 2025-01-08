@@ -56,7 +56,7 @@ class MenuPanel extends JPanel {
     }
 }
 
-class GamePanel extends JPanel implements ActionListener, KeyListener {
+class GamePanel extends JPanel implements KeyListener, ActionListener {
     Timer timer;
     int paddleX = 250;
     int paddleWidth = 100;
@@ -87,6 +87,7 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         initializeBricks();
         startCountdown();
+
     }
     private void adjustDifficulty() {
         switch (difficulty) {
@@ -119,6 +120,7 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
             } else {
                 countdown = 0;
                 gameStarted = true;
+                this.requestFocus();
                 ((Timer)e.getSource()).stop();
             }
             repaint();
@@ -133,6 +135,8 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         ballXDir = -2;
         ballYDir = -3;
         initializeBricks();
+        adjustDifficulty();
+
         countdown = 3;
         gameStarted = false;
         startCountdown();
@@ -177,6 +181,18 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
                 g.setColor(Color.GREEN);
                 g.fillRect(brick.x, brick.y, brick.width, brick.height);
             }
+        }
+    }
+
+    public void keyPressed(KeyEvent e) {
+        if (!gameStarted) return;
+
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT && paddleX > 0) {
+            paddleX -= 20;
+        }
+        if (key == KeyEvent.VK_RIGHT && paddleX < getWidth() - paddleWidth) {
+            paddleX += 20;
         }
     }
 
@@ -231,18 +247,8 @@ class GamePanel extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
-    public void keyPressed(KeyEvent e) {
-        if (!gameStarted) return;
 
-        int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT && paddleX > 0) {
-            paddleX -= 20;
-        }
-        if (key == KeyEvent.VK_RIGHT && paddleX < getWidth() - paddleWidth) {
-            paddleX += 20;
-        }
-    }
 
     public void keyReleased(KeyEvent e) {}
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {    }
 }
