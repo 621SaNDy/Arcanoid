@@ -9,8 +9,8 @@ public class Main {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
-        frame.setMinimumSize(new Dimension(600,400));
         frame.add(menuPanel);
+        frame.setResizable(false);
         frame.setVisible(true);
     }
 }
