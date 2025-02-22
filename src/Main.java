@@ -58,15 +58,20 @@ class MenuPanel extends JPanel {
 
 class GamePanel extends JPanel implements KeyListener, ActionListener {
     Timer timer;
+    Timer moveTimer;
     int paddleX = 250;
     int paddleWidth = 100;
     int paddleHeight = 10;
+    int paddleSpeed = 6;
 
     int ballX = 300;
     int ballY = 200;
     int ballSize = 10;
     int ballXDir = -2;
     int ballYDir = -3;
+
+    boolean isMovingLeft = false;
+    boolean isMovingRight = false;
 
     Brick[] bricks;
     int numBricks = 15;
@@ -81,14 +86,27 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         this.addKeyListener(this);
 
         adjustDifficulty();
-
         timer = new Timer(10, this);
         timer.start();
 
+        moveTimer = new Timer(10, _ -> movePaddle());
+        moveTimer.start();
+
         initializeBricks();
         startCountdown();
-
     }
+
+    private void movePaddle() {
+        if (isMovingLeft && paddleX > 0) {
+            paddleX -= paddleSpeed;
+        }
+        if (isMovingRight && paddleX < getWidth() - paddleWidth) {
+            paddleX += paddleSpeed;
+        }
+        repaint();
+    }
+
+
     private void adjustDifficulty() {
         switch (difficulty) {
             case "EASY":
@@ -184,18 +202,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    public void keyPressed(KeyEvent e) {
-        if (!gameStarted) return;
-
-        int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT && paddleX > 0) {
-            paddleX -= 20;
-        }
-        if (key == KeyEvent.VK_RIGHT && paddleX < getWidth() - paddleWidth) {
-            paddleX += 20;
-        }
-    }
-
     public void actionPerformed(ActionEvent e) {
         if (!gameStarted) return;
 
@@ -247,8 +253,27 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 
+    public void keyPressed(KeyEvent e) {
+        if (!gameStarted) return;
 
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT) {
+            isMovingLeft = true;
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            isMovingRight = true;
+        }
+    }
 
-    public void keyReleased(KeyEvent e) {}
-    public void keyTyped(KeyEvent e) {    }
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT) {
+            isMovingLeft = false;
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            isMovingRight = false;
+        }
+    }
+
+    public void keyTyped(KeyEvent e) {}
 }
