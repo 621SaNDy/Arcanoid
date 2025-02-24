@@ -79,6 +79,22 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     int countdown = 3;
     boolean gameStarted = false;
     private final String difficulty;
+    private int ballSpeed = 1;
+    private long startTime;
+    private int speedIncreaseInterval = 4000;
+
+    public void startGame(String difficulty) {
+        gameStarted = true;
+        startTime = System.currentTimeMillis();
+
+        if (difficulty.equals("Medium")) {
+            speedIncreaseInterval = 3000;
+        } else if (difficulty.equals("Hard")) {
+            speedIncreaseInterval = 2000;
+        }
+    }
+
+
 
     public GamePanel(String difficulty) {
         this.difficulty = difficulty;
@@ -138,6 +154,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             } else {
                 countdown = 0;
                 gameStarted = true;
+                startGame(difficulty);
                 this.requestFocus();
                 ((Timer)e.getSource()).stop();
             }
@@ -205,6 +222,17 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (!gameStarted) return;
 
+        long elapsedTime = System.currentTimeMillis() - startTime;
+
+        if (elapsedTime / speedIncreaseInterval > 0) {
+            ballSpeed = (int) (ballSpeed + 0.1);
+            startTime = System.currentTimeMillis();
+        }
+
+        double magnitude = Math.sqrt(ballXDir * ballXDir + ballYDir * ballYDir);
+        ballX += (int) ((ballXDir / magnitude) * ballSpeed);
+        ballY += (int) ((ballYDir / magnitude) * ballSpeed);
+
         ballX += ballXDir;
         ballY += ballYDir;
 
@@ -219,12 +247,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         if (ballY >= getHeight() - paddleHeight - 40 && ballX + ballSize >= paddleX && ballX <= paddleX + paddleWidth) {
             int paddleCenter = paddleX + paddleWidth / 2;
             int ballCenter = ballX + ballSize / 2;
-
             int distanceFromCenter = ballCenter - paddleCenter;
             double normalizedHit = distanceFromCenter / (double) (paddleWidth / 2);
 
             ballXDir = (int) (normalizedHit * 5);
-
             ballYDir = -Math.abs(ballYDir);
 
             if (ballXDir == 0) {
@@ -257,11 +283,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 }
 
                 brick.isDestroyed = true;
-
                 break;
             }
         }
-
 
         if (ballY > getHeight()) {
             timer.stop();
