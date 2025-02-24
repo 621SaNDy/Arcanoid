@@ -8,7 +8,7 @@ public class Main {
         MenuPanel menuPanel = new MenuPanel(frame);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(900, 600);
         frame.add(menuPanel);
         frame.setResizable(false);
         frame.setVisible(true);
@@ -28,7 +28,6 @@ class MenuPanel extends JPanel {
         titleLabel.setForeground(new Color(0xA5A5A5));
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setSize(new Dimension(60,100));
         buttonPanel.setBackground(Color.BLACK);
 
         JButton easyButton = new JButton("Łatwy");
@@ -59,26 +58,27 @@ class MenuPanel extends JPanel {
 class GamePanel extends JPanel implements KeyListener, ActionListener {
     Timer timer;
     Timer moveTimer;
-    int paddleX = 250;
-    int paddleWidth = 100;
+    int paddleX = 400;
+    int paddleWidth = 150;
     int paddleHeight = 10;
-    int paddleSpeed = 6;
+    int paddleSpeed = 8;
 
-    int ballX = 300;
-    int ballY = 200;
-    int ballSize = 10;
-    int ballXDir = -2;
-    int ballYDir = -3;
+    int ballX = 450;
+    int ballY = 300;
+    int ballSize = 12;
+    int ballXDir = -3;
+    int ballYDir = -4;
 
     boolean isMovingLeft = false;
     boolean isMovingRight = false;
 
     Brick[] bricks;
-    int numBricks = 15;
+    int numBricks = 27;
 
     int countdown = 3;
     boolean gameStarted = false;
     private final String difficulty;
+
     private int ballSpeed = 1;
     private long startTime;
     private int speedIncreaseInterval = 4000;
@@ -93,8 +93,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             speedIncreaseInterval = 2000;
         }
     }
-
-
 
     public GamePanel(String difficulty) {
         this.difficulty = difficulty;
@@ -126,24 +124,31 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     private void adjustDifficulty() {
         switch (difficulty) {
             case "EASY":
-                ballXDir = -2;
-                ballYDir = -3;
-                break;
-            case "MEDIUM":
                 ballXDir = -3;
                 ballYDir = -4;
                 break;
-            case "HARD":
+            case "MEDIUM":
                 ballXDir = -4;
                 ballYDir = -5;
+                break;
+            case "HARD":
+                ballXDir = -5;
+                ballYDir = -6;
                 break;
         }
     }
 
     private void initializeBricks() {
+        int brickWidth = 80;
+        int brickHeight = 30;
+        int cols = 9;
+        int spacing = 5;
+        int totalWidth = cols * (brickWidth + spacing) - spacing;
+        int startX = (900 - totalWidth) / 2;
+
         bricks = new Brick[numBricks];
         for (int i = 0; i < numBricks; i++) {
-            bricks[i] = new Brick((i % 5) * 100 + 50, (i / 5) * 30 + 50, 80, 20);
+            bricks[i] = new Brick(startX - 5 + (i % cols) * (brickWidth + spacing), 50 + (i / cols) * (brickHeight + spacing), brickWidth, brickHeight);
         }
     }
 
@@ -164,9 +169,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void resetGame() {
-        paddleX = 250;
-        ballX = 300;
-        ballY = 200;
+        paddleX = 375;
+        ballX = 450;
+        ballY = 300;
         ballXDir = -2;
         ballYDir = -3;
         initializeBricks();
