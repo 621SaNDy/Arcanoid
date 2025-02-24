@@ -211,30 +211,64 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         if (ballX <= 0 || ballX >= getWidth() - ballSize) {
             ballXDir = -ballXDir;
         }
+
         if (ballY <= 0) {
             ballYDir = -ballYDir;
         }
 
-        if (ballY >= getHeight() - paddleHeight - 40 && ballX >= paddleX && ballX <= paddleX + paddleWidth) {
-            ballYDir = -ballYDir;
+        if (ballY >= getHeight() - paddleHeight - 40 && ballX + ballSize >= paddleX && ballX <= paddleX + paddleWidth) {
+            int paddleCenter = paddleX + paddleWidth / 2;
+            int ballCenter = ballX + ballSize / 2;
+
+            int distanceFromCenter = ballCenter - paddleCenter;
+            double normalizedHit = distanceFromCenter / (double) (paddleWidth / 2);
+
+            ballXDir = (int) (normalizedHit * 5);
+
+            ballYDir = -Math.abs(ballYDir);
+
+            if (ballXDir == 0) {
+                ballXDir = (Math.random() > 0.5) ? 1 : -1;
+            }
         }
 
         for (Brick brick : bricks) {
-            if (!brick.isDestroyed && ballX + ballSize >= brick.x && ballX <= brick.x + brick.width &&
-                    ballY + ballSize >= brick.y && ballY <= brick.y + brick.height) {
+            if (!brick.isDestroyed &&
+                    ballX + ballSize >= brick.x &&
+                    ballX <= brick.x + brick.width &&
+                    ballY + ballSize >= brick.y &&
+                    ballY <= brick.y + brick.height) {
 
-                ballYDir = -ballYDir;
+                int ballCenterX = ballX + ballSize / 2;
+                int ballCenterY = ballY + ballSize / 2;
+                int brickCenterX = brick.x + brick.width / 2;
+                int brickCenterY = brick.y + brick.height / 2;
+
+                int deltaX = ballCenterX - brickCenterX;
+                int deltaY = ballCenterY - brickCenterY;
+
+                int overlapX = (brick.width + ballSize) / 2 - Math.abs(deltaX);
+                int overlapY = (brick.height + ballSize) / 2 - Math.abs(deltaY);
+
+                if (overlapX < overlapY) {
+                    ballXDir = -ballXDir;
+                } else {
+                    ballYDir = -ballYDir;
+                }
+
                 brick.isDestroyed = true;
+
+                break;
             }
         }
+
 
         if (ballY > getHeight()) {
             timer.stop();
             int response = JOptionPane.showConfirmDialog(this, "Game Over! Play Again?", "Game Over", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 resetGame();
-            }
-            else {
+            } else {
                 System.exit(0);
             }
         }
@@ -244,8 +278,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             int response = JOptionPane.showConfirmDialog(this, "You Win! Play Again?", "Victory", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 resetGame();
-            }
-            else {
+            } else {
                 System.exit(0);
             }
         }
