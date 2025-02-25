@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
@@ -83,6 +87,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     private long startTime;
     private int speedIncreaseInterval = 4000;
 
+    private BufferedImage backgroundImage;
+
     public void startGame(String difficulty) {
         gameStarted = true;
         startTime = System.currentTimeMillis();
@@ -98,6 +104,17 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         this.difficulty = difficulty;
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        File file = new File("img/background.jpg");
+        if (!file.exists()) {
+            System.out.println("Plik nie istnieje: " + file.getAbsolutePath());
+        } else {
+            try {
+                backgroundImage = ImageIO.read(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         adjustDifficulty();
         timer = new Timer(10, this);
@@ -195,7 +212,12 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        setBackground(Color.BLACK);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
 
         if (!gameStarted) {
             g.setColor(new Color(0, 0, 0, 150));
