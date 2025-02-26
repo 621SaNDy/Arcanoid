@@ -65,7 +65,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     int paddleX = 400;
     int paddleWidth = 150;
     int paddleHeight = 10;
-    int paddleSpeed = 8;
+    int paddleSpeed = 15;
 
     int ballX = 450;
     int ballY = 300;
@@ -83,7 +83,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     boolean gameStarted = false;
     private final String difficulty;
 
-    private int ballSpeed = 1;
+    private float ballSpeed = 1;
     private long startTime;
     private int speedIncreaseInterval = 4000;
 
@@ -212,6 +212,12 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Point hotSpot = new Point(0,0);
+        BufferedImage cursorImage = new BufferedImage(1, 1, BufferedImage.TRANSLUCENT);
+        Cursor invisibleCursor = toolkit.createCustomCursor(cursorImage, hotSpot, "InvisibleCursor");
+        setCursor(invisibleCursor);
+
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         } else {
@@ -252,7 +258,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         long elapsedTime = System.currentTimeMillis() - startTime;
 
         if (elapsedTime / speedIncreaseInterval > 0) {
-            ballSpeed = (int) (ballSpeed + 0.1);
+            ballSpeed = (float) (ballSpeed + 0.1);
             startTime = System.currentTimeMillis();
         }
 
