@@ -137,7 +137,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 
-
     private void adjustDifficulty() {
         switch (difficulty) {
             case "EASY":
