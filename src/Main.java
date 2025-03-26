@@ -73,6 +73,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     int ballXDir = -3;
     int ballYDir = -4;
 
+    int difficultyLevel = 1;
+
     boolean isMovingLeft = false;
     boolean isMovingRight = false;
 
@@ -81,7 +83,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     int countdown = 3;
     boolean gameStarted = false;
-    private final String difficulty;
+    private String difficulty;
 
     private float ballSpeed = 1;
     private long startTime;
@@ -138,16 +140,30 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void adjustDifficulty() {
+        switch (difficultyLevel) {
+            case 1:
+                difficulty = "EASY";
+                break;
+            case 2:
+                difficulty = "MEDIUM";
+                break;
+            case 3:
+                difficulty = "HARD";
+                break;
+        }
         switch (difficulty) {
             case "EASY":
+                difficultyLevel = 1;
                 ballXDir = -3;
                 ballYDir = -4;
                 break;
             case "MEDIUM":
+                difficultyLevel = 2;
                 ballXDir = -4;
                 ballYDir = -5;
                 break;
             case "HARD":
+                difficultyLevel = 3;
                 ballXDir = -5;
                 ballYDir = -6;
                 break;
@@ -333,6 +349,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             timer.stop();
             int response = JOptionPane.showConfirmDialog(this, "You Win! Play Again?", "Victory", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
+                difficultyLevel += 1;
                 resetGame();
             } else {
                 System.exit(0);
