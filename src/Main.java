@@ -6,6 +6,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import static javax.swing.BorderFactory.*;
+
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Arkanoid");
@@ -15,6 +17,7 @@ public class Main {
         frame.setSize(900, 600);
         frame.add(menuPanel);
         frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }
@@ -25,18 +28,31 @@ class MenuPanel extends JPanel {
     public MenuPanel(JFrame frame) {
         this.frame = frame;
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.BLACK);
+        this.setBackground(new Color(20, 20, 40));
 
-        JLabel titleLabel = new JLabel("Wybierz Poziom Trudności", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(new Color(0xA5A5A5));
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBackground(new Color(0, 0, 0, 0));
+        titlePanel.setBorder(createEmptyBorder(50, 0, 50, 0));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.BLACK);
+        JLabel titleLabel = new JLabel("ARKANOID", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setForeground(new Color(255, 215, 0));
+        titleLabel.setBorder(createEmptyBorder(0, 0, 10, 0));
 
-        JButton easyButton = new JButton("Łatwy");
-        JButton mediumButton = new JButton("Średni");
-        JButton hardButton = new JButton("Trudny");
+        JLabel subtitleLabel = new JLabel("Wybierz poziom trudności", JLabel.CENTER);
+        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        subtitleLabel.setForeground(Color.WHITE);
+
+        titlePanel.add(titleLabel, BorderLayout.NORTH);
+        titlePanel.add(subtitleLabel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 0, 20));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(createEmptyBorder(0, 250, 100, 250));
+
+        JButton easyButton = createStyledButton("ŁATWY", new Color(76, 175, 80));
+        JButton mediumButton = createStyledButton("ŚREDNI", new Color(255, 152, 0));
+        JButton hardButton = createStyledButton("TRUDNY", new Color(244, 67, 54));
 
         easyButton.addActionListener(_ -> startGame("EASY"));
         mediumButton.addActionListener(_ -> startGame("MEDIUM"));
@@ -46,8 +62,28 @@ class MenuPanel extends JPanel {
         buttonPanel.add(mediumButton);
         buttonPanel.add(hardButton);
 
-        this.add(titleLabel, BorderLayout.NORTH);
+        this.add(titlePanel, BorderLayout.NORTH);
         this.add(buttonPanel, BorderLayout.CENTER);
+    }
+
+    private JButton createStyledButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setForeground(Color.WHITE);
+        button.setBackground(color);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
+                button.setBackground(color.darker());
+            }
+            public void mouseExited(MouseEvent evt) {
+                button.setBackground(color);
+            }
+        });
+
+        return button;
     }
 
     private void startGame(String difficulty) {
@@ -56,6 +92,7 @@ class MenuPanel extends JPanel {
         frame.add(gamePanel);
         frame.revalidate();
         frame.repaint();
+        gamePanel.requestFocusInWindow();
     }
 }
 
@@ -292,7 +329,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             ballYDir = -ballYDir;
         }
 
-        if (ballY >= getHeight() - paddleHeight - 40 && ballX + ballSize >= paddleX && ballX <= paddleX + paddleWidth) {
+        if (ballY + ballSize >= getHeight() - paddleHeight - 40 &&
+                ballY + ballSize <= getHeight() - 30 &&
+                ballX + ballSize >= paddleX &&
+                ballX <= paddleX + paddleWidth) {
             int paddleCenter = paddleX + paddleWidth / 2;
             int ballCenter = ballX + ballSize / 2;
             int distanceFromCenter = ballCenter - paddleCenter;
@@ -335,7 +375,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
 
-        if (ballY > getHeight()) {
+        if (ballY > getHeight() - ballSize) {
             timer.stop();
             int response = JOptionPane.showConfirmDialog(this, "Game Over! Play Again?", "Game Over", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="arcanoid:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/arcanoid_jar</output-path>
+    <root id="archive" name="arcanoid.jar">
+      <element id="module-output" name="arcanoid" />
+    </root>
+  </artifact>
+</component>
