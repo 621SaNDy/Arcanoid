@@ -238,6 +238,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void resetGame() {
+        isMovingLeft = false;
+        isMovingRight = false;
+
         paddleX = 375;
         ballX = 450;
         ballY = 300;
@@ -377,16 +380,23 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         if (ballY > getHeight() - ballSize) {
             timer.stop();
+            moveTimer.stop();
+            isMovingLeft = false;
+            isMovingRight = false;
             int response = JOptionPane.showConfirmDialog(this, "Game Over! Play Again?", "Game Over", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 resetGame();
             } else {
                 System.exit(0);
             }
+            return;
         }
 
         if (checkWinCondition()) {
             timer.stop();
+            moveTimer.stop();
+            isMovingLeft = false;
+            isMovingRight = false;
             int response = JOptionPane.showConfirmDialog(this, "You Win! Play Again?", "Victory", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 difficultyLevel += 1;
@@ -394,6 +404,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             } else {
                 System.exit(0);
             }
+            return;
         }
 
         repaint();
