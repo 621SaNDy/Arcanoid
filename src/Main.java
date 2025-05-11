@@ -128,15 +128,14 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private BufferedImage backgroundImage;
 
-    public void startGame(String difficulty) {
+    private void startGame(String difficulty) {
+        this.difficulty = difficulty;
         gameStarted = true;
         startTime = System.currentTimeMillis();
 
-        if (difficulty.equals("Medium")) {
-            speedIncreaseInterval = 3000;
-        } else if (difficulty.equals("Hard")) {
-            speedIncreaseInterval = 2000;
-        }
+        adjustDifficulty();
+        initializeBricks();
+        this.requestFocus();
     }
 
     public GamePanel(String difficulty) {
@@ -177,47 +176,64 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void adjustDifficulty() {
-        switch (difficultyLevel) {
-            case 1:
-                difficulty = "EASY";
-                break;
-            case 2:
-                difficulty = "MEDIUM";
-                break;
-            case 3:
-                difficulty = "HARD";
-                break;
-        }
         switch (difficulty) {
             case "EASY":
-                difficultyLevel = 1;
                 ballXDir = -3;
-                ballYDir = -4;
+                ballYDir = -3;
+                paddleWidth = 150;
+                speedIncreaseInterval = 10000;
                 break;
             case "MEDIUM":
-                difficultyLevel = 2;
                 ballXDir = -4;
-                ballYDir = -5;
+                ballYDir = -4;
+                paddleWidth = 120;
+                speedIncreaseInterval = 6000;
                 break;
             case "HARD":
-                difficultyLevel = 3;
                 ballXDir = -5;
-                ballYDir = -6;
+                ballYDir = -5;
+                paddleWidth = 100;
+                speedIncreaseInterval = 3000;
                 break;
         }
+        ballSpeed = 1;
     }
 
     private void initializeBricks() {
-        int brickWidth = 80;
-        int brickHeight = 30;
+        int brickWidth = 70;
+        int brickHeight = 25;
         int cols = 9;
-        int spacing = 5;
+        int spacing = ballSize + 5;
         int totalWidth = cols * (brickWidth + spacing) - spacing;
         int startX = (900 - totalWidth) / 2;
 
         bricks = new Brick[numBricks];
+
         for (int i = 0; i < numBricks; i++) {
-            bricks[i] = new Brick(startX - 5 + (i % cols) * (brickWidth + spacing), 50 + (i / cols) * (brickHeight + spacing), brickWidth, brickHeight);
+            int row = i / cols;
+            int col = i % cols;
+            boolean indestructible = false;
+
+            switch(difficulty) {
+                case "MEDIUM":
+                    if (Math.random() < 0.15) {
+                        indestructible = true;
+                    }
+                    break;
+                case "HARD":
+                    if (Math.random() < 0.25 || row == 0) {
+                        indestructible = true;
+                    }
+                    break;
+            }
+
+            bricks[i] = new Brick(
+                    startX + col * (brickWidth + spacing),
+                    50 + row * (brickHeight + spacing),
+                    brickWidth,
+                    brickHeight,
+                    indestructible
+            );
         }
     }
 
@@ -244,20 +260,25 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         paddleX = 375;
         ballX = 450;
         ballY = 300;
-        ballXDir = -2;
-        ballYDir = -3;
-        initializeBricks();
+        ballSpeed = 1;
+
         adjustDifficulty();
+        initializeBricks();
 
         countdown = 3;
         gameStarted = false;
         startCountdown();
-        timer.start();
+
+        if (!timer.isRunning()) timer.start();
+        if (!moveTimer.isRunning()) moveTimer.start();
+
+        this.requestFocusInWindow();
     }
+
 
     private boolean checkWinCondition() {
         for (Brick brick : bricks) {
-            if (!brick.isDestroyed) {
+            if (!brick.isDestroyed && !brick.indestructible) {
                 return false;
             }
         }
@@ -301,19 +322,27 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         for (Brick brick : bricks) {
             if (!brick.isDestroyed) {
-                g.setColor(Color.GREEN);
+                if (brick.indestructible) {
+                    g.setColor(Color.GRAY);
+                } else {
+                    g.setColor(Color.GREEN);
+                }
                 g.fillRect(brick.x, brick.y, brick.width, brick.height);
+
+                g.setColor(Color.BLACK);
+                g.drawRect(brick.x, brick.y, brick.width, brick.height);
             }
         }
     }
+
 
     public void actionPerformed(ActionEvent e) {
         if (!gameStarted) return;
 
         long elapsedTime = System.currentTimeMillis() - startTime;
 
-        if (elapsedTime / speedIncreaseInterval > 0) {
-            ballSpeed = (float) (ballSpeed + 0.1);
+        if (elapsedTime >= speedIncreaseInterval) {
+            ballSpeed *= (float) 1.15;
             startTime = System.currentTimeMillis();
         }
 
@@ -355,6 +384,26 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                     ballX <= brick.x + brick.width &&
                     ballY + ballSize >= brick.y &&
                     ballY <= brick.y + brick.height) {
+
+                if (brick.indestructible) {
+                    int ballCenterX = ballX + ballSize / 2;
+                    int ballCenterY = ballY + ballSize / 2;
+                    int brickCenterX = brick.x + brick.width / 2;
+                    int brickCenterY = brick.y + brick.height / 2;
+
+                    int deltaX = ballCenterX - brickCenterX;
+                    int deltaY = ballCenterY - brickCenterY;
+
+                    int overlapX = (brick.width + ballSize) / 2 - Math.abs(deltaX);
+                    int overlapY = (brick.height + ballSize) / 2 - Math.abs(deltaY);
+
+                    if (overlapX < overlapY) {
+                        ballXDir = -ballXDir;
+                    } else {
+                        ballYDir = -ballYDir;
+                    }
+                    break;
+                }
 
                 int ballCenterX = ballX + ballSize / 2;
                 int ballCenterY = ballY + ballSize / 2;
