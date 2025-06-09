@@ -491,18 +491,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             int rectX = (getWidth() - rectWidth) / 2;
             int rectY = (getHeight() - rectHeight) / 2;
 
-            GradientPaint countdownBg = new GradientPaint(
-                    rectX, rectY, new Color(40, 40, 70, 220),
-                    rectX, rectY + rectHeight, new Color(20, 20, 40, 240)
-            );
-            g2d.setPaint(countdownBg);
-            g2d.fillRoundRect(rectX, rectY, rectWidth, rectHeight, 20, 20);
-
-            g2d.setColor(new Color(255, 215, 0, 180));
-            g2d.setStroke(new BasicStroke(3));
-            g2d.drawRoundRect(rectX, rectY, rectWidth, rectHeight, 20, 20);
-
-            g2d.setColor(new Color(0, 0, 0, 100));
             g2d.setFont(new Font("Segoe UI", Font.BOLD, 72));
             String countdownText = String.valueOf(countdown);
             FontMetrics fm = g2d.getFontMetrics();
@@ -599,11 +587,11 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 if (powerUp.type == 0) {
                     glowColor = new Color(0, 255, 100, 80);
                     mainColor = new Color(0, 200, 80);
-                    symbol = "━━";
+                    symbol = "——";
                 } else {
                     glowColor = new Color(255, 215, 0, 80);
                     mainColor = new Color(255, 180, 0);
-                    symbol = "×2";
+                    symbol = "+2";
                 }
 
                 g2d.setColor(glowColor);
