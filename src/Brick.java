@@ -8,7 +8,6 @@ public class Brick {
     int powerUpChance;
     int powerUpType;
 
-    // Visual enhancement properties
     private long hitTime = 0;
     private boolean isHit = false;
 
@@ -33,7 +32,6 @@ public class Brick {
         }
     }
 
-    // Method to trigger hit animation
     public void hit() {
         if (!indestructible) {
             isHit = true;
@@ -41,7 +39,6 @@ public class Brick {
         }
     }
 
-    // Check if hit animation should be shown
     public boolean shouldShowHitEffect() {
         return isHit && (System.currentTimeMillis() - hitTime < 200);
     }
