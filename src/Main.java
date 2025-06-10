@@ -23,7 +23,8 @@ public class Main {
 }
 
 class MenuPanel extends JPanel {
-    private final JFrame frame;    public MenuPanel(JFrame frame) {
+    private final JFrame frame;
+    public MenuPanel(JFrame frame) {
         this.frame = frame;
         this.setLayout(new BorderLayout());
 
@@ -44,7 +45,8 @@ class MenuPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 0, 25));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(createEmptyBorder(0, 200, 120, 200));        JButton easyButton = createStyledButton("EASY", new Color(76, 175, 80), new Color(56, 142, 60));
+        buttonPanel.setBorder(createEmptyBorder(0, 200, 120, 200));
+        JButton easyButton = createStyledButton("EASY", new Color(76, 175, 80), new Color(56, 142, 60));
         JButton mediumButton = createStyledButton("MEDIUM", new Color(255, 152, 0), new Color(245, 124, 0));
         JButton hardButton = createStyledButton("HARD", new Color(244, 67, 54), new Color(211, 47, 47));
 
@@ -58,7 +60,8 @@ class MenuPanel extends JPanel {
 
         this.add(titlePanel, BorderLayout.NORTH);
         this.add(buttonPanel, BorderLayout.CENTER);
-    }    private JButton createStyledButton(String text, Color primaryColor, Color darkColor) {
+    }
+    private JButton createStyledButton(String text, Color primaryColor, Color darkColor) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 22));
         button.setForeground(Color.WHITE);
@@ -93,7 +96,8 @@ class MenuPanel extends JPanel {
         return button;
     }
 
-    @Override protected void paintComponent(Graphics g) {
+    @Override
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -129,7 +133,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
     int paddleX = 400;
     int paddleWidth = 150;
     int paddleHeight = 10;
-    int paddleSpeed = 15;    float initialPaddleSpeed = 10;
+    int paddleSpeed = 15;
+    float initialPaddleSpeed = 10;
     float maxPaddleSpeed = 20;
     float paddleAcceleration = 0.01f;
 
@@ -190,10 +195,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         gameStartTimeMillis = System.currentTimeMillis();
         gameTimeSeconds = 0;
         initGameTimeTimer();
-
-        String difficultyMessage = difficulty + " Level Started!";
-        showMessage(difficultyMessage);
-
         adjustDifficulty();
         initializeBricks();
         initializeBalls();
@@ -311,7 +312,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 speedIncreaseInterval = 10000;
                 initialPaddleSpeed = 8;
                 maxPaddleSpeed = 15;
-                paddleAcceleration = 0.005f;
+                paddleAcceleration = 0.004f;
                 break;
             case "MEDIUM":
                 ballXDir = -4;
@@ -320,7 +321,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 speedIncreaseInterval = 6000;
                 initialPaddleSpeed = 10;
                 maxPaddleSpeed = 18;
-                paddleAcceleration = 0.01f;
+                paddleAcceleration = 0.006f;
                 break;
             case "HARD":
                 ballXDir = -5;
@@ -329,7 +330,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 speedIncreaseInterval = 3000;
                 initialPaddleSpeed = 12;
                 maxPaddleSpeed = 20;
-                paddleAcceleration = 0.015f;
+                paddleAcceleration = 0.008f;
                 break;        }
         ballSpeed = 1;
         paddleSpeed = (int)initialPaddleSpeed;
@@ -422,6 +423,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         adjustDifficulty();
         initializeBricks();
+
+        gameStartTimeMillis = System.currentTimeMillis();
+        gameTimeSeconds = 0;
 
         countdown = 3;
         gameStarted = false;
@@ -778,17 +782,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
             ballSpeed *= 1.03f;
             if (ballSpeed > 2.0f) {
                 ballSpeed = 2.0f;
-            }
-            startTime = System.currentTimeMillis();
-
-            if (ballSpeed < 1.8f) {
-                showMessage("Speed Increased!");
-            }
-        }
-        if (widePaddleActive && System.currentTimeMillis() - powerUpStartTime > POWER_UP_DURATION) {
+            }            startTime = System.currentTimeMillis();
+        }        if (widePaddleActive && System.currentTimeMillis() - powerUpStartTime > POWER_UP_DURATION) {
             widePaddleActive = false;
             targetPaddleWidth = originalPaddleWidth;
-            showMessage(" Wide Paddle Expired");
         }
 
         for (int i = activePowerUps.size() - 1; i >= 0; i--) {
@@ -908,24 +905,13 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                             ball.yDir = -ball.yDir;
                         }
                         brick.isDestroyed = true;
-                        if (Math.random() < 0.03) {
-                            String[] destructionMessages = {
-                                    "SMASH!", "BOOM!", "NICE!", "PERFECT!", "BULLSEYE!"
-                            };
-                            showMessage(destructionMessages[(int)(Math.random() * destructionMessages.length)]);
-                        }
                         if (brick.powerUpType >= 0) {
                             PowerUp powerUp = new PowerUp(
-                                    brick.x + brick.width / 2 - 10,
-                                    brick.y + brick.height,
-                                    brick.powerUpType
-                            );
+                                brick.x + brick.width / 2 - 10,
+                                brick.y + brick.height,
+                                brick.powerUpType
+                        );
                             activePowerUps.add(powerUp);
-
-                            if (Math.random() < 0.5) {
-                                String powerUpName = (brick.powerUpType == 0) ? "Wide Paddle" : "Multi-Ball";
-                                showMessage(powerUpName + " Power-Up!");
-                            }
                         }
                     }
                     hitBrick = true;
@@ -939,13 +925,13 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 } else {
                     timer.stop();
                     moveTimer.stop();
+                    gameTimeTimer.stop();
                     isMovingLeft = false;
                     isMovingRight = false;
 
                     showMessage("GAME OVER!");
 
-
-                    Timer gameOverDelay = new Timer(1500, new ActionListener() {
+                    Timer gameOverDelay = new Timer(3000, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             ((Timer)e.getSource()).stop();
@@ -956,7 +942,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                                     JOptionPane.YES_NO_OPTION
                             );
                             if (response == JOptionPane.YES_OPTION) {
-                                showMessage("Restarting game...");
                                 resetGame();
                             } else {
                                 System.exit(0);
@@ -972,13 +957,15 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         if (checkWinCondition()) {
             timer.stop();
             moveTimer.stop();
+            gameTimeTimer.stop();
             isMovingLeft = false;
             isMovingRight = false;
 
             showMessage("VICTORY! Level Completed!");
 
-            Timer victoryDelay = new Timer(1500, new ActionListener() {
-                @Override public void actionPerformed(ActionEvent e) {
+            Timer victoryDelay = new Timer(3000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
                     ((Timer)e.getSource()).stop();
                     showVictoryDialog();
                 }
@@ -1009,6 +996,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
                 this,
                 message,
                 "Victory!",
+
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -1017,45 +1005,39 @@ class GamePanel extends JPanel implements KeyListener, ActionListener {
         );
         if (difficulty.equals("HARD")) {
             if (choice == 0) {
-                showMessage("Restarting HARD level...");
-                resetGame();
-            } else {
-                System.exit(0);
-            }
+            showMessage("Restarting HARD level...");
+            resetGame();
+        } else {
+            System.exit(0);
+        }
         } else {
             if (choice == 0) {
-                String nextDifficulty = difficulty.equals("EASY") ? "MEDIUM" : "HARD";
-                this.difficulty = nextDifficulty;
-                difficultyLevel += 1;
-                showMessage("Advancing to " + nextDifficulty + " level!");
-                resetGame();
-            } else if (choice == 1) {
-                showMessage("Restarting " + difficulty + " level...");
-                resetGame();
-            } else {
-                System.exit(0);
-            }
+            String nextDifficulty = difficulty.equals("EASY") ? "MEDIUM" : "HARD";
+            this.difficulty = nextDifficulty;
+            difficultyLevel += 1;
+            resetGame();
+        } else if (choice == 1) {
+            resetGame();
+        } else {
+            System.exit(0);
+        }
         }
     }
 
     private void activatePowerUp(PowerUp powerUp) {
-        switch (powerUp.type) {
-            case 0:
-                if (!widePaddleActive) {
-                    originalPaddleWidth = paddleWidth;
-                    targetPaddleWidth = (int)(paddleWidth * 1.8f);
-                    widePaddleActive = true;
-                    powerUpStartTime = System.currentTimeMillis();
-                    showMessage("Wide Paddle Activated!");
-                } else {
-                    powerUpStartTime = System.currentTimeMillis();
-                    showMessage("Wide Paddle Extended!");
-                }
-                break;
-            case 1:
-                addExtraBalls();
-                showMessage("Multi-Ball Activated!");
-                break;
+        switch (powerUp.type) {            case 0:
+            if (!widePaddleActive) {
+                originalPaddleWidth = paddleWidth;
+                targetPaddleWidth = (int)(paddleWidth * 1.8f);
+                widePaddleActive = true;
+                powerUpStartTime = System.currentTimeMillis();
+                showMessage("Wide Paddle Activated!");
+            } else {
+                powerUpStartTime = System.currentTimeMillis();
+            }
+            break;            case 1:
+            addExtraBalls();
+            break;
         }
     }
 
